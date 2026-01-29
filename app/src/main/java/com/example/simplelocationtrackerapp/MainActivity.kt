@@ -14,34 +14,49 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.simplelocationtrackerapp.ui.theme.SimpleLocationTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var locationManager: LocationManager
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Initialize LocationManager
+        locationManager = LocationManager(this)
+        
         setContent {
             SimpleLocationTrackerAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    MapScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    
+    override fun onResume() {
+        super.onResume()
+        // Resume location updates when app comes to foreground
+        if (locationManager.hasLocationPermissions()) {
+            // LocationManager will handle updates in MapScreen
+        }
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        // Stop location updates when app goes to background to save battery
+        locationManager.stopLocationUpdates()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clean up location resources
+        locationManager.stopLocationUpdates()
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MapScreenPreview() {
     SimpleLocationTrackerAppTheme {
-        Greeting("Android")
+        MapScreen()
     }
 }
